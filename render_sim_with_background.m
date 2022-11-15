@@ -1,4 +1,4 @@
-function render_sim_Driftcam_instagram(Sim_Output, Model_Params, stl_filename, video_filename, speed, model_scale)
+function animate_result(Sim_Output, Model_Params, stl_filename, video_filename, speed, model_scale)
 %RENDER_SIM_DRIFTCAM Render Video of Driftcam Simulation 
 %function render_sim_Driftcam_instagram(Sim_Output, Model_Params, stl_filename, video_filename, speed, model_scale)
 %inputs:
@@ -19,12 +19,10 @@ function render_sim_Driftcam_instagram(Sim_Output, Model_Params, stl_filename, v
 fps = 30;
 dt = (1/fps)*speed;
 
-Actual_Color = [0 0 0]; %Color of all actual forces attitutes etc
-%Setpoint_Color = [0.4 0.4 0.5]; %Color of all setpoints and commanded forces etc.
-Setpoint_Color = [1 1 1]; %Color of all setpoints and commanded forces etc.
+Platform1_Color = [1 1 0]; %Color of platform 1 (Yellow)
+Platform2_Color = [1 0.647 0]; %Color of platform 2 (Orange)
 %Vehicle_Color = [0.2 0.8 0.2];
-Vehicle_Color = [0.9882 0.5961 0.0118];
-Line_Color = [0.5 0.25 0];
+%Line_Color = [0.5 0.25 0];
 
 [Vertices_b,faces,normals,name] = stlRead(stl_filename);
 %[CS_Vertices_b,CS_faces,CS_normals,CS_name] = stlRead('Coordinate_System.stl');
@@ -163,10 +161,10 @@ while(index<=n)
         subplot(5,3,[2 3 5 6 8 9 11 12]);
         %keyboard;
         %plot(t(1:index),eta1(1:index,3),'-b',t(index),eta1(index,3),'dk', 'color', Actual_Color, t(1:index), z_SP(1:index), '--','color', Setpoint_Color,'MarkerSize',20,'LineWidth', 3);
-        plot(t(1:index)/3600,eta1(1:index,3),'-b',t(index),eta1(index,3),'dk', 'color', Actual_Color, 'LineWidth', 3);
+        plot(t(1:index)/3600,eta1(1:index,3),'-b',t(index),eta1(index,3),'dk', 'color', Platform1_Color, 'LineWidth', 3);
         hold on;
-        plot(t(index)/3600,eta1(index,3),'dk', 'color', Actual_Color, 'MarkerSize',20,'LineWidth', 3);
-        plot(t(1:index)/3600, z_SP(1:index), '-','color', Setpoint_Color,'LineWidth', 2);
+        plot(t(index)/3600,eta1(index,3),'dk', 'color', Platform1_Color, 'MarkerSize',20,'LineWidth', 3);
+        plot(t(1:index)/3600, z_SP(1:index), '-','color', Platform2_Color,'LineWidth', 2);
         hold off;
         %axis([min_t max_t min_z_plot max_z_plot]);
         axis([min_t/3600 max_t/3600 0 280]);
@@ -192,7 +190,7 @@ while(index<=n)
         Control_State_V1 = [Control_State.V1];
         V1_command = Control_State_V1(index).command';
         b = bar([accel*1e4 V1(3)*100]);
-        b(1).FaceColor = Actual_Color;
+        b(1).FaceColor = Platform1_Color;
         %b(2).FaceColor = Setpoint_Color;  
         title('Dynamics');
         axis([0.5, 2.5, -max_V1*100, max_V1*100]);
