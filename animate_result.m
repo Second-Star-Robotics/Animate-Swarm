@@ -155,80 +155,79 @@ while(index<=n)
 
         hold off;
 
-        keyboard;
         
-        %plot Depth Track Setpoint
-        %CS_Vertices_i = (inv(squeeze(Sim_State.J1_eta2_setpoint(index,:,:)))*CS_Vertices_b')';
-        subplot(5,3,[2 3 5 6 8 9 11 12]);
-        %keyboard;
-        %plot(t(1:index),eta1(1:index,3),'-b',t(index),eta1(index,3),'dk', 'color', Actual_Color, t(1:index), z_SP(1:index), '--','color', Setpoint_Color,'MarkerSize',20,'LineWidth', 3);
-        plot(t(1:index)/3600,eta1(1:index,3),'-b',t(index),eta1(index,3),'dk', 'color', Platform1_Color, 'LineWidth', 3);
-        hold on;
-        plot(t(index)/3600,eta1(index,3),'dk', 'color', Platform1_Color, 'MarkerSize',20,'LineWidth', 3);
-        plot(t(1:index)/3600, z_SP(1:index), '-','color', Platform2_Color,'LineWidth', 2);
-        hold off;
-        %axis([min_t max_t min_z_plot max_z_plot]);
-        axis([min_t/3600 max_t/3600 0 280]);
-        grid;
-        set(gca,'Ydir','reverse')
-        xlabel('Time [hr]');
-        ylabel('Depth [m]');
-        t_str = ['t = ', num2str(frame_time,'%0.0f'), ' s'];
-        title(t_str);
-        
-        hold on
-        I = imread('Diel_Migration_With_Predator_Pray_Interaction.jpg'); 
-        h = image(xlim,ylim,I); 
-        uistack(h,'bottom')
-        hold off
-
-        
-        %plot Velocity
-        subplot(5,3,13);
-        V1 = Sim_State(index).V1;
-        V_dot = Sim_State(index).V_dot;
-        accel = V_dot(3);
-        Control_State_V1 = [Control_State.V1];
-        V1_command = Control_State_V1(index).command';
-        b = bar([accel*1e4 V1(3)*100]);
-        b(1).FaceColor = Platform1_Color;
-        %b(2).FaceColor = Setpoint_Color;  
-        title('Dynamics');
-        axis([0.5, 2.5, -max_V1*100, max_V1*100]);
-        grid on;
-        set(gca,'Ydir','reverse');
-        u_tick = ['u = ',num2str(V1(2)), ' [m/s]'];
-        v_tick = ['v = ',num2str(V1(2)), ' [m/s]'];
-        accel_tick = ['accel = ', num2str(accel*1e6, '%0.1f'), ' \mum/s^2'];
-        w_tick = ['vel = ',num2str(V1(3)*100, '%0.2f'), ' cm/s'];
-        %xticklabels({u_tick v_tick w_tick});
-        xticklabels({accel_tick w_tick});
-
-        %plot Engine Volume
-        subplot(5,3,14);
-        Nabla_eng = Sim_State(index).Nabla_eng; %[L]
-        sps = Sim_State(index).sps/12812.3;
-        Control_State_Nabla_eng = [Control_State.Nabla_eng];
-        %Nabla_eng_command = Control_State_Nabla_eng(index).command; %[L]
-        b = bar([abs(sps)*0.1 Nabla_eng]);
-        b.FaceColor = [0 0 0];       
-        title('Buoyancy Engine');
-        axis([0.5, 2.5, 0, 1.5]);
-        grid on;
-        xtick_volume = ['Volume = ',num2str(Nabla_eng, '%0.2f'),' L'];
-        xtick_pumpspeed = ['Speed = ',num2str(abs(sps), '%0.2f'),' rpm'];
-        xticklabels({xtick_pumpspeed xtick_volume}); 
-              
-        %plot Environment
-        subplot(5,3,15);
-        b = bar([rho(index) Ta(index)]);
-        b.FaceColor = [0 0 0];        
-        title('Environment');
-        axis([0.5, 2.5, 0, 30]);
-        grid on;
-        xtick_seawater = ['Density = ', num2str(rho(index), '%0.3f'), ' kg/L'];
-        xtick_temp = ['T = ', num2str(Ta(index), '%0.1f'), ' ', char(176), 'C'];
-        xticklabels({xtick_seawater, xtick_temp});
+%         %plot Depth Track Setpoint
+%         %CS_Vertices_i = (inv(squeeze(Sim_State.J1_eta2_setpoint(index,:,:)))*CS_Vertices_b')';
+%         subplot(5,3,[2 3 5 6 8 9 11 12]);
+%         %keyboard;
+%         %plot(t(1:index),eta1(1:index,3),'-b',t(index),eta1(index,3),'dk', 'color', Actual_Color, t(1:index), z_SP(1:index), '--','color', Setpoint_Color,'MarkerSize',20,'LineWidth', 3);
+%         plot(t(1:index)/3600,eta1(1:index,3),'-b',t(index),eta1(index,3),'dk', 'color', Platform1_Color, 'LineWidth', 3);
+%         hold on;
+%         plot(t(index)/3600,eta1(index,3),'dk', 'color', Platform1_Color, 'MarkerSize',20,'LineWidth', 3);
+%         plot(t(1:index)/3600, z_SP(1:index), '-','color', Platform2_Color,'LineWidth', 2);
+%         hold off;
+%         %axis([min_t max_t min_z_plot max_z_plot]);
+%         axis([min_t/3600 max_t/3600 0 280]);
+%         grid;
+%         set(gca,'Ydir','reverse')
+%         xlabel('Time [hr]');
+%         ylabel('Depth [m]');
+%         t_str = ['t = ', num2str(frame_time,'%0.0f'), ' s'];
+%         title(t_str);
+%         
+%         hold on
+%         I = imread('Diel_Migration_With_Predator_Pray_Interaction.jpg'); 
+%         h = image(xlim,ylim,I); 
+%         uistack(h,'bottom')
+%         hold off
+% 
+%         
+%         %plot Velocity
+%         subplot(5,3,13);
+%         V1 = Sim_State(index).V1;
+%         V_dot = Sim_State(index).V_dot;
+%         accel = V_dot(3);
+%         Control_State_V1 = [Control_State.V1];
+%         V1_command = Control_State_V1(index).command';
+%         b = bar([accel*1e4 V1(3)*100]);
+%         b(1).FaceColor = Platform1_Color;
+%         %b(2).FaceColor = Setpoint_Color;  
+%         title('Dynamics');
+%         axis([0.5, 2.5, -max_V1*100, max_V1*100]);
+%         grid on;
+%         set(gca,'Ydir','reverse');
+%         u_tick = ['u = ',num2str(V1(2)), ' [m/s]'];
+%         v_tick = ['v = ',num2str(V1(2)), ' [m/s]'];
+%         accel_tick = ['accel = ', num2str(accel*1e6, '%0.1f'), ' \mum/s^2'];
+%         w_tick = ['vel = ',num2str(V1(3)*100, '%0.2f'), ' cm/s'];
+%         %xticklabels({u_tick v_tick w_tick});
+%         xticklabels({accel_tick w_tick});
+% 
+%         %plot Engine Volume
+%         subplot(5,3,14);
+%         Nabla_eng = Sim_State(index).Nabla_eng; %[L]
+%         sps = Sim_State(index).sps/12812.3;
+%         Control_State_Nabla_eng = [Control_State.Nabla_eng];
+%         %Nabla_eng_command = Control_State_Nabla_eng(index).command; %[L]
+%         b = bar([abs(sps)*0.1 Nabla_eng]);
+%         b.FaceColor = [0 0 0];       
+%         title('Buoyancy Engine');
+%         axis([0.5, 2.5, 0, 1.5]);
+%         grid on;
+%         xtick_volume = ['Volume = ',num2str(Nabla_eng, '%0.2f'),' L'];
+%         xtick_pumpspeed = ['Speed = ',num2str(abs(sps), '%0.2f'),' rpm'];
+%         xticklabels({xtick_pumpspeed xtick_volume}); 
+%               
+%         %plot Environment
+%         subplot(5,3,15);
+%         b = bar([rho(index) Ta(index)]);
+%         b.FaceColor = [0 0 0];        
+%         title('Environment');
+%         axis([0.5, 2.5, 0, 30]);
+%         grid on;
+%         xtick_seawater = ['Density = ', num2str(rho(index), '%0.3f'), ' kg/L'];
+%         xtick_temp = ['T = ', num2str(Ta(index), '%0.1f'), ' ', char(176), 'C'];
+%         xticklabels({xtick_seawater, xtick_temp});
 
         drawnow;
 
