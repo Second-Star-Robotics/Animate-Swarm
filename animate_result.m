@@ -17,11 +17,14 @@
 %See also SETUP_DRIFTCAM_MODEL SETUP_CONTROL_PARAMS PLOT_SIM_DRIFTCAM SIM_DRIFTCAM
 
 t = [0:.01:2*pi]';
-z = sin(t)*50-50;
-stl_filename = '221028-ful-exterior-asm-simplified-low.stl';
+z1 = sin(t)*50+50;
+z2 = sin(t+pi/2)*50+50;
+%stl_filename = '221028-ful-exterior-asm-simplified-low.stl';
+stl_filename = 'Drifter.stl';
 video_filename = 'test.avi';
 speed = 1;
-model_scale = 1;
+model_scale = 5;
+n_platforms = 2;
 
 fps = 30;
 dt = (1/fps)*speed;
@@ -33,11 +36,12 @@ dt = (1/fps)*speed;
 platform(1).color = [1 1 0]; %Yellow
 platform(1).object.vertices = Vertices_b*model_scale;
 platform(1).object.faces = faces;
+platform(1).z = z1;
 
 platform(2).color = [1 0.647 0]; %Orange
 platform(2).object.vertices = Vertices_b*model_scale;
 platform(2).object.faces = faces;
-
+platform(2).z = z2;
 
 %Extract vectors from Sim_State
 n = length(t);
@@ -45,8 +49,8 @@ n = length(t);
 %Determine max and min values for the renders and curves
 min_t = min(t);
 max_t = max(t);
-min_z = min(z);
-max_z = max(z);
+min_z = min(min(platform(:).z))-10;
+max_z = max(max(platform(:).z))+10;
 range_z = max_z-min_z;
 middle_z = mean([min_z max_z]);
 min_z_plot = middle_z-(range_z*1.1)/2;
@@ -86,11 +90,13 @@ max_y_plot = 0+y_range/2;
 %Initialize Figure and allow user to size
 %figure('units','normalized','outerposition',[0 0 1 1]);
 %figure('Position',[0 0 1080 1350]);
-figure('Position',[0 0 1920 1080]);
-set(gcf,'color','w');
-disp('Please position and size plot window for rendering');
-input('Press any Enter to continue');
-disp('Rendering...')
+
+%figure('Position',[0 0 1920 1080]);
+%set(gcf,'color','w');
+%disp('Please position and size plot window for rendering');
+%input('Press any Enter to continue');
+%disp('Rendering...')
+
 h1 = subplot(3,4,[1 2 5 6]);
 h2 = subplot(3,4,3);
 
@@ -114,33 +120,42 @@ while(index<=n)
         %eta1 = Sim_State(index).eta1';
         %eta1 = zeros(1,3); %center vehicle in axes and show only attitude change
         delete(h1); %delete the figure to refresh
-        h1 = subplot(5,3,[1 4 7 10]);
-        %stlPlot(Vertices_i+eta1,faces,['t = ', num2str(frame_time,'%0.2f')]);
-        platform_color = platform(1).color;
-        platform_object = platform(1).object;
-        patch(platform_object,'FaceColor',       platform_color, ...
-         'EdgeColor',       'none',        ...
-         'FaceLighting',    'gouraud',     ...
-         'AmbientStrength', 0.15);
-        set(gca,'Zdir','reverse','Ydir','reverse')
-        camlight('headlight');
-        material('shiny');
-        axis equal;
-        view(45, 35);
-        grid on;
+        
+        hold on;
+        platform_index = 0;
+        while(platform_index<n_platforms)
+            platform_index = platform_index + 1;
+            h1 = subplot(5,3,[1 4 7 10]);
+            %stlPlot(Vertices_i+eta1,faces,['t = ', num2str(frame_time,'%0.2f')]);
+            platform_color = platform(platform_index).color;
+            platform_object = platform(platform_index).object;
+            z = platform(platform_index).z(index);
+            platform_object.vertices = platform_object.vertices + [0,0,z];
+            patch((platform_object),'FaceColor',       platform_color, ...
+             'EdgeColor',       'none',        ...
+             'FaceLighting',    'gouraud',     ...
+             'AmbientStrength', 0.15);
+            set(gca,'Zdir','reverse','Ydir','reverse')
+            camlight('headlight');
+            material('shiny');
+            axis equal;
+            view(45, 35);
+            grid on;
+            %axis ([-1.5 1.5 -1.5 1.5 -1 1]);
+            %axis ([-3 3 -3 3 -12 12]);
+            axis([min_x_plot max_x_plot min_y_plot max_y_plot min_z_plot max_z_plot]);
+            title_str = ['Depth = ', num2str(z, '%0.2f'), ' m'];
+            %xlabel('x');
+            %ylabel('y');
+            set(gca,'XTick',[])
+            set(gca,'YTick',[])
+            zlabel('Depth [m]');
+            %title(title_str);
+        end
+
+        hold off;
+
         keyboard;
-        %axis ([-1.5 1.5 -1.5 1.5 -1 1]);
-        %axis ([-3 3 -3 3 -12 12]);
-        axis([min_x_plot max_x_plot min_y_plot max_y_plot 0 280]);
-        x_str = ['x = ', num2str(eta1(index,1), '%0.3f'), 'm '];
-        y_str = ['y = ', num2str(eta1(index,2), '%0.3f'), 'm '];
-        z_str = ['Depth = ', num2str(eta1(index,3), '%0.2f'), ' m'];
-        %title([x_str, y_str, z_str]);
-        title([z_str]);
-        %title('1 2 5 6');
-        %xlabel('x');
-        %ylabel('y');
-        zlabel('Depth [m]');
         
         %plot Depth Track Setpoint
         %CS_Vertices_i = (inv(squeeze(Sim_State.J1_eta2_setpoint(index,:,:)))*CS_Vertices_b')';
