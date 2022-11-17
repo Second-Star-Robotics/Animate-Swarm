@@ -16,32 +16,45 @@
 %
 %See also SETUP_DRIFTCAM_MODEL SETUP_CONTROL_PARAMS PLOT_SIM_DRIFTCAM SIM_DRIFTCAM
 
-t = [0:.01:2*pi]';
+%Load data from Cong's simulation
+load density_estimate_output.mat
+
+t = [0:.001:2*pi]';
 z1 = sin(t)*50+50;
 z2 = sin(t+pi/2)*50+50;
+z3 = sin(t+pi)*50+50;
 %stl_filename = '221028-ful-exterior-asm-simplified-low.stl';
-stl_filename = 'Drifter.stl';
+platform_stl = 'Drifter.stl';
+layer_stl = 'squid.stl';
 video_filename = 'test.avi';
 speed = 1;
-model_scale = 5;
+platform_model_scale = 7;
+layer_model_scale = 15;
 n_platforms = 2;
 
 fps = 30;
 dt = (1/fps)*speed;
 
-%Load STL Model
-[Vertices_b,faces,normals,name] = stlRead(stl_filename);
+%Load STL Models
+[Vertices_b,faces,normals,name] = stlRead(platform_stl);
+[Vertices_layer, faces_layer, normals_layer, name_layer] = stlRead(layer_stl);
 
-%Platform 1 rendering characteristics
-platform(1).color = [1 1 0]; %Yellow
-platform(1).object.vertices = Vertices_b*model_scale;
+%Platform rendering characteristics
+platform(1).color = [0 0 1]; %Yellow
+platform(1).object.vertices = Vertices_b*platform_model_scale;
 platform(1).object.faces = faces;
 platform(1).z = z1;
 
 platform(2).color = [1 0.647 0]; %Orange
-platform(2).object.vertices = Vertices_b*model_scale;
+platform(2).object.vertices = Vertices_b*platform_model_scale;
 platform(2).object.faces = faces;
 platform(2).z = z2;
+
+%Layer Rendering Characteristics
+layer.object.vertices = Vertices_layer*layer_model_scale;
+layer.object.faces = faces_layer;
+layer.color = [1,0,0]; %Red squid
+layer.z = z3;
 
 %Extract vectors from Sim_State
 n = length(t);
@@ -97,8 +110,11 @@ max_y_plot = 0+y_range/2;
 %input('Press any Enter to continue');
 %disp('Rendering...')
 
-h1 = subplot(3,4,[1 2 5 6]);
-h2 = subplot(3,4,3);
+model_axis = subplot(4,4,[1 5 9 13]);
+plot_axis = subplot(4,4,[2 3 4 6 7 8 10 11]);
+density_axis = subplot(4,4,[14 15 16]);
+
+keyboard;
 
 %Create output video file
 current_directory = cd;
@@ -114,27 +130,23 @@ while(index<=n)
     if (t(index)>frame_time+dt)
         frame_time = frame_time+dt;
  
-        %plot Driftcam body
-        %Vertices_i = (inv(squeeze(Sim_State.J1_eta2(index,:,:)))*Vertices_b')';
-        %Vertices_i = (inv(Sim_State(index).J1_eta2)*Vertices_b')'.*model_scale;
-        %eta1 = Sim_State(index).eta1';
-        %eta1 = zeros(1,3); %center vehicle in axes and show only attitude change
-        delete(h1); %delete the figure to refresh
+        %plot Platforms
+        delete(model_axis); %delete the figure to refresh
         
         hold on;
+        subplot(model_axis);
         platform_index = 0;
         while(platform_index<n_platforms)
             platform_index = platform_index + 1;
-            h1 = subplot(5,3,[1 4 7 10]);
             %stlPlot(Vertices_i+eta1,faces,['t = ', num2str(frame_time,'%0.2f')]);
             platform_color = platform(platform_index).color;
             platform_object = platform(platform_index).object;
             z = platform(platform_index).z(index);
             platform_object.vertices = platform_object.vertices + [0,0,z];
             patch((platform_object),'FaceColor',       platform_color, ...
-             'EdgeColor',       'none',        ...
-             'FaceLighting',    'gouraud',     ...
-             'AmbientStrength', 0.15);
+                 'EdgeColor',       'none',        ...
+                 'FaceLighting',    'gouraud',     ...
+                 'AmbientStrength', 0.10);
             set(gca,'Zdir','reverse','Ydir','reverse')
             camlight('headlight');
             material('shiny');
@@ -153,8 +165,40 @@ while(index<=n)
             %title(title_str);
         end
 
+        
+        %plot Layer
+        layer_object = layer.object;
+        layer_color = layer.color;
+        z = layer.z(index);
+        layer_object.vertices = layer_object.vertices + [0,0,z];
+        patch((layer_object),'FaceColor',       layer_color, ...
+             'EdgeColor',       'none',        ...
+             'FaceLighting',    'gouraud',     ...
+             'AmbientStrength', 0.10);
+        set(gca,'Zdir','reverse','Ydir','reverse')
+        camlight('headlight');
+        material('shiny');
+        axis equal;
+        view(45, 35);
+        grid on;
+        %axis ([-1.5 1.5 -1.5 1.5 -1 1]);
+        %axis ([-3 3 -3 3 -12 12]);
+        axis([min_x_plot max_x_plot min_y_plot max_y_plot min_z_plot max_z_plot]);
+        title_str = ['Depth = ', num2str(z, '%0.2f'), ' m'];
+        %xlabel('x');
+        %ylabel('y');
+        set(gca,'XTick',[])
+        set(gca,'YTick',[])
+        zlabel('Depth [m]');
+        %title(title_str);
+
         hold off;
 
+        subplot(plot_axis);
+        title('Density vs. Time');
+
+        subplot(density_axis);
+        title('Density Observed');
         
 %         %plot Depth Track Setpoint
 %         %CS_Vertices_i = (inv(squeeze(Sim_State.J1_eta2_setpoint(index,:,:)))*CS_Vertices_b')';
