@@ -1,0 +1,1 @@
+This folder is where all output animations are saved.
