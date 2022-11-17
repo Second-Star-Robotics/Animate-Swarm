@@ -25,36 +25,38 @@
 % grid on;
 % 
 % figure(2)
-% q0 = plot(t_space,tr_C_1./tr_C_1,'LineWidth',2);
-% hold on
-% q1 = plot(t_space,tr_C_2./tr_C_1,'LineWidth',2);
-% q2 = plot(t_space,tr_C_2_C./tr_C_1,'LineWidth',2);
+q0 = plot(t_space,tr_C_1./tr_C_1,'LineWidth',2);
+hold on
+q1 = plot(t_space,tr_C_2./tr_C_1,'LineWidth',2);
+q2 = plot(t_space,tr_C_2_C./tr_C_1,'LineWidth',2);
+xlabel('Time (hr)','FontSize',20)
+ylabel('%trace(C)','FontSize', 40,'Interpreter','latex')
+% ylabel('$tr[\hat{e}\hat{e}^T]$','FontSize', 40,'Interpreter','latex')
+axis([0 48 0 1.2])
+legend([q0 q1 q2],{'Single Dirftcam','Two Driftcam','Two Driftcam, Closed-loop'},'FontSize',15)
+% title('Estimation Error covariance trace','FontSize',20)
+ax = gca; % current axes
+ax.FontSize = 20;
+grid on;
+keyboard;
+
+
+% 
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% figure(1)
+% plot(t_space,tr_C,'LineWidth',2);
 % xlabel('Time (hr)','FontSize',20)
-% ylabel('%trace(C)','FontSize', 40,'Interpreter','latex')
-% % ylabel('$tr[\hat{e}\hat{e}^T]$','FontSize', 40,'Interpreter','latex')
-% axis([0 48 0 1.2])
-% legend([q0 q1 q2],{'Single Dirftcam','Two Driftcam','Two Driftcam, Closed-loop'},'FontSize',15)
-% % title('Estimation Error covariance trace','FontSize',20)
-% ax = gca; % current axes
-% ax.FontSize = 20;
-% grid on;
-
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-figure(1)
-plot(t_space,tr_C,'LineWidth',2);
-xlabel('Time (hr)','FontSize',20)
-ylabel('trace(C)','FontSize', 40,'Interpreter','latex')
-title('Measurement updated every 10 min','FontSize',20)
-figure(2)
+% ylabel('trace(C)','FontSize', 40,'Interpreter','latex')
+% title('Measurement updated every 10 min','FontSize',20)
+% figure(2)
 % plot(t_space,mean(Rho_error,1),'LineWidth',2);
-plot(t_space(1:k-1),error(1:k-1),'LineWidth',2);
-xlabel('Time (hr)','FontSize',20)
-ylabel('Error','FontSize', 40,'Interpreter','latex')
-title('Measurement updated every 10 min','FontSize',20)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+% plot(t_space(1:k-1),error(1:k-1),'LineWidth',2);
+% xlabel('Time (hr)','FontSize',20)
+% ylabel('Error','FontSize', 40,'Interpreter','latex')
+% title('Measurement updated every 10 min','FontSize',20)
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
 % T_space_outer1 = t_space.*ones(length(zeta_outer1(:,1)),length(t_space));
 % T_space_outer2 = t_space.*ones(length(zeta_outer2(:,1)),length(t_space));
 % x_hat_mean = reshape(mean(x_hat,2),[L,length(t_space)]);
@@ -66,26 +68,28 @@ title('Measurement updated every 10 min','FontSize',20)
 % t_m = t_space.*ones(M,length(T_space));
 % k_m = find(z_measure);
 % t_m = t_m(k_m);
-figure(3)
-%h = surf(T_space,Zeta,(x_esti));
-% h = meshz(T_space,Zeta,(x_esti));
-% h = surf(T_space,Zeta,(rho));
-% h = surf(T_space,Zeta,rho);
-% set(h,'LineStyle','none')
+%figure(3)
+
+
+hold on
+h = surf(T_space,Zeta,(x_esti));
 view(0,90)
 shading interp
 colorbar
 co = colorbar;
 co.Label.String = 'Density';
-co.FontSize = 20;
-hold on
+%co.FontSize = 20;
+
+yticks([-800 -700 -600 -500 -400 -300 -200 -100 0]);
+yticklabels({'800' '700' '600' '500' '400' '300' '200' '100' '0'})
+
 
 % h_outer1 = surf(T_space_outer1,zeta_outer1,rho_outer1);
 % h_outer2 = surf(T_space_outer2,zeta_outer2,rho_outer2);
 % set(h_outer1,'LineStyle','none')
 % set(h_outer2,'LineStyle','none')
 % p0 = scatter3(t_m,z_measure(k_m),25*ones(1,length(k_m)),'red','filled');
-p0 = scatter3(t_space(kk),z(1,kk),250*ones(1,length(kk)),'r','filled');
+%p0 = scatter3(t_space(kk),z(1,kk),250*ones(1,length(kk)),'r','filled');
 
 % scatter3(t_space(kk),z(2,kk),250*ones(1,length(kk)),'r','filled');
 % scatter3(t_space(kk),z(3,kk),25*ones(1,length(kk)),'r','filled');
@@ -96,6 +100,7 @@ p0 = scatter3(t_space(kk),z(1,kk),250*ones(1,length(kk)),'r','filled');
 % scatter3(t_space(kk),z(8,kk),25*ones(1,length(kk)),'r','filled');
 
 p2 = plot3(t_space,z(1,:),250*ones(1,length(t_space)),'LineStyle','--','Color','r');
+keyboard;
 % plot3(t_space,z(2,:),250*ones(1,length(t_space)),'LineStyle','--','Color','r');
 % plot3(t_space,z(3,:),25*ones(1,length(t_space)),'LineStyle','--','Color','r');
 % plot3(t_space,z(4,:),25*ones(1,length(t_space)),'LineStyle','--','Color','r');
